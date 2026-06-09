@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Приглашение на свадьбу</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="pretitle">Приглашение</p>
+        <h1>Алёна &amp; Валерий</h1>
+        <p class="hero-date">29 августа 2026&nbsp;г. — 16:00</p>
+        <p class="guest-name" id="guestName">Дорогие друзья и близкие</p>
+        <p class="invite-text" id="inviteText">Мы будем очень рады видеть вас на нашем празднике. Пожалуйста, используйте вашу персональную ссылку, чтобы подтвердить присутствие.</p>
+        <p class="hero-description">Мы готовим тёплый вечер в атмосфере современной элегантности: вкусная еда, душевная программа и много эмоций. Ждём вас в ресторане Тургенев в Батайске.</p>
+      </div>
+    </section>
+
+    <section class="countdown" id="countdownSection">
+      <h2>До начала свадьбы</h2>
+      <div class="timer-grid" id="timerGrid">
+        <div><span id="days">00</span><small>дней</small></div>
+        <div><span id="hours">00</span><small>часов</small></div>
+        <div><span id="minutes">00</span><small>минут</small></div>
+        <div><span id="seconds">00</span><small>секунд</small></div>
+      </div>
+    </section>
+
+    <section class="info-block">
+      <div>
+        <h2>Информация о мероприятии</h2>
+        <p><strong>Дата:</strong> 29 августа 2026</p>
+        <p><strong>Время:</strong> 16:00</p>
+        <p><strong>Место:</strong> Ресторан Тургенев</p>
+        <p><strong>Город:</strong> Батайск</p>
+        <p>Мы подготовили непринуждённую программу: церемония, тёплый банкет и вечер с музыкой. Одежда — элегантный вечерний стиль.</p>
+      </div>
+      <div class="map-card">
+        <h3>Как добраться</h3>
+        <iframe class="map-frame" src="https://yandex.ru/map-widget/v1/?ll=37.618423%2C55.751244&z=15" frameborder="0" allowfullscreen></iframe>
+        <a href="https://yandex.ru/maps/?ll=37.618423%2C55.751244&z=15" target="_blank" rel="noreferrer">Открыть в Яндекс.Картах</a>
+      </div>
+    </section>
+
+    <section class="section" id="programSection">
+      <h2>Программа</h2>
+      <ul class="program-list" id="programList"></ul>
+    </section>
+
+    <section class="gallery" id="gallerySection">
+      <h2>Фотографии</h2>
+      <div class="carousel" id="carousel"></div>
+      <div class="carousel-controls">
+        <button id="prevPhoto">‹</button>
+        <button id="nextPhoto">›</button>
+      </div>
+    </section>
+
+    <section class="section dress-code">
+      <h2>Дресс-код</h2>
+      <p>Элегантный вечерний стиль. Мягкие оттенки, пастель, натуральные ткани и изысканные детали.</p>
+      <div class="palette">
+        <span style="background:#F7F3EE"></span>
+        <span style="background:#E8D8C4"></span>
+        <span style="background:#A8B2A1"></span>
+        <span style="background:#DCCBB8"></span>
+        <span style="background:#333333"></span>
+      </div>
+    </section>
+
+    <section class="section wishes">
+      <h2>Пожелания</h2>
+      <p>Пожалуйста, не дарите цветы. Будем рады вашему присутствию, теплым словам и хорошему настроению.</p>
+    </section>
+
+    <section class="section gifts">
+      <h2>Пожелания по подаркам</h2>
+      <p>Лучший подарок — ваше присутствие. Если хотите, можно обсудить подарок с организатором.</p>
+    </section>
+
+    <section class="rsvp" id="rsvpSection">
+      <h2>RSVP</h2>
+      <form id="rsvpForm">
+        <div class="field-group">
+          <label>Планируете ли вы присутствовать?</label>
+          <div class="radio-row">
+            <label><input type="radio" name="attendance" value="true" checked /> Да</label>
+            <label><input type="radio" name="attendance" value="false" /> Нет</label>
+          </div>
+        </div>
+        <div class="field-group" id="guestCountWrapper">
+          <label for="guestCount">Сколько человек будет присутствовать?</label>
+          <input type="number" id="guestCount" name="guest_count" min="1" value="1" />
+        </div>
+        <div class="field-group">
+          <label>Будут ли дети?</label>
+          <div class="radio-row">
+            <label><input type="radio" name="children" value="true" /> Да</label>
+            <label><input type="radio" name="children" value="false" checked /> Нет</label>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Требуется ли вегетарианское меню?</label>
+          <div class="radio-row">
+            <label><input type="radio" name="vegetarian" value="true" /> Да</label>
+            <label><input type="radio" name="vegetarian" value="false" checked /> Нет</label>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="allergies">Аллергии</label>
+          <input type="text" id="allergies" name="allergies" placeholder="Укажите, если есть" />
+        </div>
+        <div class="field-group">
+          <label for="phone">Контактный телефон</label>
+          <input type="text" id="phone" name="phone" placeholder="+7 (___) ___-__-__" />
+        </div>
+        <div class="field-group">
+          <label for="telegram">Telegram</label>
+          <input type="text" id="telegram" name="telegram" placeholder="@username" />
+        </div>
+        <div class="field-group">
+          <label for="comment">Дополнительные пожелания</label>
+          <textarea id="comment" name="comment" rows="4" placeholder="Ваше сообщение"></textarea>
+        </div>
+        <button type="submit" class="submit-button">Отправить ответ</button>
+      </form>
+      <div class="thank-you" id="thankYouMessage" hidden>
+        <h3>Спасибо!</h3>
+        <p>Ваш ответ успешно получен.</p>
+      </div>
+      <div class="note" id="generalNote" hidden>
+        <p>Если у вас нет персональной ссылки — информация выше доступна в общем виде. Для отправки RSVP используйте индивидуальную ссылку в приглашении.</p>
+      </div>
+    </section>
+  </main>
+  <script src="/static/script.js"></script>
+</body>
+</html>
