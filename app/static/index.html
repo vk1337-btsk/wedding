@@ -1422,19 +1422,12 @@
 
     <!-- Скрипт для скрытия заставки -->
     <script>
-      $(document).ready(function () {
-        setTimeout(function () {
-          $("#rec540056894").delay(3500).fadeOut("slow");
-          $("body").css("overflow", "");
-          window.dispatchEvent(new Event("resize"));
-        }, 6000);
-      });
       $(window).on("load", function () {
-        $("#rec540056894").delay(3500).fadeOut("slow");
         setTimeout(function () {
+          $("#rec540056894").fadeOut("slow");
           $("body").css("overflow", "");
           window.dispatchEvent(new Event("resize"));
-        }, 3400);
+        }, 60000);
       });
     </script>
   </head>
@@ -2922,7 +2915,7 @@
             setTimeout(function () {
               showInvitation();
               window.scrollTo({ top: 0, behavior: "auto" });
-            }, 3600);
+            }, 10000 );
           } catch (error) {
             showFallback();
           }
