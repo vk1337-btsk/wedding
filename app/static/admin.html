@@ -1,65 +1,66 @@
-<!DOCTYPE html>
+<!-- app\static\admin.html -->
+<!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Администрирование свадьбы</title>
-  <link rel="stylesheet" href="/static/styles.css" />
-</head>
-<body>
-  <main class="admin-shell">
-    <header class="admin-header">
-      <h1>Панель администратора</h1>
-      <p>Управление приглашениями, фотографиями, ответами и статистикой.</p>
-    </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Администрирование свадьбы</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="admin-shell">
+      <header class="admin-header">
+        <h1>Панель администратора</h1>
+        <p>Управление приглашениями, фотографиями, ответами и статистикой.</p>
+      </header>
 
-    <section class="admin-section">
-      <h2>Статистика</h2>
-      <div class="stats-grid" id="statsGrid"></div>
-    </section>
+      <section class="admin-section">
+        <h2>Статистика</h2>
+        <div class="stats-grid" id="statsGrid"></div>
+      </section>
 
-    <section class="admin-section">
-      <h2>Приглашения</h2>
-      <form id="invitationForm" class="admin-form">
-        <input type="hidden" id="invitationId" />
-        <label>Имя гостя</label>
-        <input id="guestNameInput" type="text" placeholder="Иван и Мария" required />
-        <label>Текст приглашения</label>
-        <textarea id="inviteTextInput" rows="3" placeholder="Ваш текст приглашения" required></textarea>
-        <label>Код ссылки (необязательно)</label>
-        <input id="inviteCodeInput" type="text" placeholder="A1B2C3" />
-        <button type="submit">Сохранить приглашение</button>
-      </form>
-      <div id="invitationsList" class="admin-table"></div>
-    </section>
+      <section class="admin-section">
+        <h2>Приглашения</h2>
+        <form id="invitationForm" class="admin-form">
+          <input type="hidden" id="invitationId" />
+          <label>Имя гостя</label>
+          <input id="guestNameInput" type="text" placeholder="Иван и Мария" required />
+          <label>Текст приглашения</label>
+          <textarea id="inviteTextInput" rows="3" placeholder="Ваш текст приглашения" required></textarea>
+          <label>Код ссылки (необязательно)</label>
+          <input id="inviteCodeInput" type="text" placeholder="A1B2C3" />
+          <button type="submit">Сохранить приглашение</button>
+        </form>
+        <div id="invitationsList" class="admin-table"></div>
+      </section>
 
-    <section class="admin-section">
-      <h2>Ответы</h2>
-      <div id="responsesList" class="admin-table"></div>
-    </section>
+      <section class="admin-section">
+        <h2>Ответы</h2>
+        <div id="responsesList" class="admin-table"></div>
+      </section>
 
-    <section class="admin-section">
-      <h2>Фотографии</h2>
-      <form id="photoForm" class="admin-form" enctype="multipart/form-data">
-        <input id="photoFileInput" type="file" accept="image/jpeg,image/png,image/webp" required />
-        <button type="submit">Загрузить фотографию</button>
-      </form>
-      <div id="photosList" class="admin-table"></div>
-    </section>
+      <section class="admin-section">
+        <h2>Фотографии</h2>
+        <form id="photoForm" class="admin-form" enctype="multipart/form-data">
+          <input id="photoFileInput" type="file" accept="image/jpeg,image/png,image/webp" required />
+          <button type="submit">Загрузить фотографию</button>
+        </form>
+        <div id="photosList" class="admin-table"></div>
+      </section>
 
-    <section class="admin-section">
-      <h2>Программа</h2>
-      <form id="programForm" class="admin-form">
-        <input type="hidden" id="programItemId" />
-        <label>Время</label>
-        <input id="programTimeInput" type="text" placeholder="14:00" required />
-        <label>Описание</label>
-        <input id="programTitleInput" type="text" placeholder="Сбор гостей" required />
-        <button type="submit">Сохранить этап</button>
-      </form>
-      <div id="programList" class="admin-table"></div>
-    </section>
-  </main>
-  <script src="/static/admin.js"></script>
-</body>
+      <section class="admin-section">
+        <h2>Программа</h2>
+        <form id="programForm" class="admin-form">
+          <input type="hidden" id="programItemId" />
+          <label>Время</label>
+          <input id="programTimeInput" type="text" placeholder="14:00" required />
+          <label>Описание</label>
+          <input id="programTitleInput" type="text" placeholder="Сбор гостей" required />
+          <button type="submit">Сохранить этап</button>
+        </form>
+        <div id="programList" class="admin-table"></div>
+      </section>
+    </main>
+    <script src="/static/admin.js"></script>
+  </body>
 </html>

@@ -1,3 +1,4 @@
+# app\email_utils.py
 import smtplib
 from email.message import EmailMessage
 

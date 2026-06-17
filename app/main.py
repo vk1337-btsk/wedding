@@ -1,3 +1,4 @@
+# app\main.py
 from pathlib import Path
 from secrets import compare_digest
 
@@ -15,7 +16,7 @@ from .seed import seed_data
 app = FastAPI(title="Wedding Invitation")
 security = HTTPBasic()
 static_dir = Path(__file__).resolve().parent / "static"
-app.mount("/static", StaticFiles(directory=static_dir), name="static")
+app.mount("/photos", StaticFiles(directory="app/static/photos"), name="photos")
 
 
 def get_admin_user(credentials: HTTPBasicCredentials = Depends(security)) -> str:

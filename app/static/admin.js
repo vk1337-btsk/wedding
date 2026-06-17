@@ -1,3 +1,4 @@
+// app\static\admin.js
 const statsGrid = document.getElementById("statsGrid");
 const invitationsList = document.getElementById("invitationsList");
 const responsesList = document.getElementById("responsesList");

@@ -1,3 +1,4 @@
+# app\crud.py
 import sqlite3
 from datetime import datetime
 from pathlib import Path
@@ -14,7 +15,9 @@ def generate_code(length: int = 8) -> str:
     return token_urlsafe(length).replace("-", "_")[:length]
 
 
-def create_invitation(guest_name: str, invitation_text: str, invite_code: str | None = None) -> dict:
+def create_invitation(
+    guest_name: str, invitation_text: str, invite_code: str | None = None
+) -> dict:
     conn = get_connection()
     cursor = conn.cursor()
     if invite_code is None:
@@ -50,7 +53,9 @@ def list_invitations() -> list[dict]:
     return [dict(row) for row in cursor.fetchall()]
 
 
-def update_invitation(invitation_id: int, guest_name: str, invitation_text: str) -> dict | None:
+def update_invitation(
+    invitation_id: int, guest_name: str, invitation_text: str
+) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -127,7 +132,9 @@ def count_stats() -> dict:
     confirmed = cursor.fetchone()[0]
     cursor.execute("SELECT COUNT(*) FROM responses WHERE attendance = 0")
     declined = cursor.fetchone()[0]
-    cursor.execute("SELECT COUNT(*) FROM invitations WHERE id NOT IN (SELECT invitation_id FROM responses)")
+    cursor.execute(
+        "SELECT COUNT(*) FROM invitations WHERE id NOT IN (SELECT invitation_id FROM responses)"
+    )
     unanswered = cursor.fetchone()[0]
     return {
         "total_invitations": total,
@@ -168,7 +175,9 @@ def delete_photo(photo_id: int) -> None:
 def update_photo_order(photo_id: int, sort_order: int) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE photos SET sort_order = ? WHERE id = ?", (sort_order, photo_id))
+    cursor.execute(
+        "UPDATE photos SET sort_order = ? WHERE id = ?", (sort_order, photo_id)
+    )
     conn.commit()
     cursor.execute("SELECT * FROM photos WHERE id = ?", (photo_id,))
     return _row_to_dict(cursor.fetchone())
@@ -189,10 +198,16 @@ def add_program_item(event_time: str, title: str, sort_order: int) -> dict:
         (event_time, title, sort_order),
     )
     conn.commit()
-    return _row_to_dict(cursor.execute("SELECT * FROM program_items WHERE id = ?", (cursor.lastrowid,)).fetchone())
+    return _row_to_dict(
+        cursor.execute(
+            "SELECT * FROM program_items WHERE id = ?", (cursor.lastrowid,)
+        ).fetchone()
+    )
 
 
-def update_program_item(item_id: int, event_time: str, title: str, sort_order: int) -> dict | None:
+def update_program_item(
+    item_id: int, event_time: str, title: str, sort_order: int
+) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
