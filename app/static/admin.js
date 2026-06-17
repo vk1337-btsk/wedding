@@ -1,22 +1,29 @@
-// app\static\admin.js
+// app/static/admin.js
 const statsGrid = document.getElementById("statsGrid");
 const invitationsList = document.getElementById("invitationsList");
 const responsesList = document.getElementById("responsesList");
-const photosList = document.getElementById("photosList");
-const programList = document.getElementById("programList");
-const invitationForm = document.getElementById("invitationForm");
-const programForm = document.getElementById("programForm");
-const photoForm = document.getElementById("photoForm");
 
+// Формы
+const invitationForm = document.getElementById("invitationForm");
+const responseForm = document.getElementById("responseForm");
+
+// Поля приглашений
 const invitationIdInput = document.getElementById("invitationId");
 const guestNameInput = document.getElementById("guestNameInput");
 const inviteTextInput = document.getElementById("inviteTextInput");
 const inviteCodeInput = document.getElementById("inviteCodeInput");
-const programItemIdInput = document.getElementById("programItemId");
-const programTimeInput = document.getElementById("programTimeInput");
-const programTitleInput = document.getElementById("programTitleInput");
-const photoFileInput = document.getElementById("photoFileInput");
 
+// Поля ответов
+const responseIdInput = document.getElementById("responseId");
+const responseInvitationSelect = document.getElementById("responseInvitationSelect");
+const responseWillCome = document.getElementById("responseWillCome");
+const responseComment = document.getElementById("responseComment");
+const responseAllergies = document.getElementById("responseAllergies");
+const responseAllergiesDetails = document.getElementById("responseAllergiesDetails");
+const responseAlcohol = document.getElementById("responseAlcohol");
+const responseAdditionalInfo = document.getElementById("responseAdditionalInfo");
+
+// ---------- Утилиты ----------
 async function fetchJson(url, options = {}) {
   const response = await fetch(url, options);
   if (!response.ok) {
@@ -26,6 +33,16 @@ async function fetchJson(url, options = {}) {
   return response.json();
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// ---------- Рендеринг ----------
 function renderStats(stats) {
   statsGrid.innerHTML = "";
   for (const [label, value] of Object.entries(stats)) {
@@ -41,9 +58,9 @@ function renderInvitations(items) {
     .map(
       (item) => `
         <tr>
-          <td>${item.guest_name}</td>
-          <td>${item.invite_code}</td>
-          <td>${item.created_at}</td>
+          <td>${escapeHtml(item.guest_name)}</td>
+          <td>${escapeHtml(item.invite_code)}</td>
+          <td>${escapeHtml(item.created_at)}</td>
           <td>
             <button data-edit="${item.id}">Редактировать</button>
             <button data-delete="${item.id}">Удалить</button>
@@ -59,64 +76,56 @@ function renderResponses(items) {
     .map(
       (item) => `
         <tr>
-          <td>${item.guest_name}</td>
-          <td>${item.attendance ? "Да" : "Нет"}</td>
-          <td>${item.guest_count || 0}</td>
-          <td>${item.children ? "Да" : "Нет"}</td>
-          <td>${item.vegetarian ? "Да" : "Нет"}</td>
-          <td>${item.allergies || "-"}</td>
-          <td>${item.phone || "-"}</td>
-          <td>${item.telegram || "-"}</td>
-          <td>${item.comment || "-"}</td>
-          <td>${item.answered_at}</td>
-        </tr>`
-    )
-    .join("");
-  responsesList.innerHTML = `<table><thead><tr><th>Гость</th><th>Придут</th><th>Гостей</th><th>Дети</th><th>Вегет.</th><th>Аллергии</th><th>Телефон</th><th>Telegram</th><th>Комментарий</th><th>Дата</th></tr></thead><tbody>${rows}</tbody></table>`;
-}
-
-function renderPhotos(items) {
-  const rows = items
-    .map(
-      (item) => `
-        <tr>
-          <td><img style="width:120px; border-radius:14px;" src="${item.url}" alt="photo" /></td>
-          <td>${item.original_filename}</td>
-          <td>${item.sort_order}</td>
-          <td>${item.uploaded_at}</td>
-          <td><button data-delete-photo="${item.id}">Удалить</button></td>
-        </tr>`
-    )
-    .join("");
-  photosList.innerHTML = `<table><thead><tr><th>Превью</th><th>Имя файла</th><th>Порядок</th><th>Загружен</th><th>Действия</th></tr></thead><tbody>${rows}</tbody></table>`;
-}
-
-function renderProgram(items) {
-  const rows = items
-    .map(
-      (item) => `
-        <tr>
-          <td>${item.event_time}</td>
-          <td>${item.title}</td>
-          <td>${item.sort_order}</td>
+          <td>${escapeHtml(item.guest_name)}</td>
+          <td>${item.will_come === "yes" ? "Да" : "Нет"}</td>
+          <td>${escapeHtml(item.comment_will_come || "-")}</td>
+          <td>${item.allergies ? "Да" : "Нет"}</td>
+          <td>${escapeHtml(item.allergies_details || "-")}</td>
+          <td>${item.alcohol ? "Да" : "Нет"}</td>
+          <td>${escapeHtml(item.additional_info || "-")}</td>
+          <td>${escapeHtml(item.answered_at)}</td>
           <td>
-            <button data-edit-program="${item.id}">Изменить</button>
-            <button data-delete-program="${item.id}">Удалить</button>
+            <button data-edit-response="${item.id}">Редактировать</button>
+            <button data-delete-response="${item.id}">Удалить</button>
           </td>
         </tr>`
     )
     .join("");
-  programList.innerHTML = `<table><thead><tr><th>Время</th><th>Описание</th><th>Порядок</th><th>Действия</th></tr></thead><tbody>${rows}</tbody></table>`;
+  responsesList.innerHTML = `<table><thead><tr><th>Гость</th><th>Придёт?</th><th>Пояснение</th><th>Аллергии</th><th>Описание</th><th>Алкоголь</th><th>Доп. инфо</th><th>Дата ответа</th><th>Действия</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
+// ---------- Загрузка данных для селекта гостей ----------
+async function populateGuestSelect() {
+  try {
+    const data = await fetchJson("/api/admin/invitations");
+    const select = responseInvitationSelect;
+    const currentValue = select.value;
+    select.innerHTML = '<option value="">-- Выберите гостя --</option>';
+    data.invitations.forEach((inv) => {
+      const option = document.createElement("option");
+      option.value = inv.id;
+      option.textContent = `${inv.guest_name} (${inv.invite_code})`;
+      select.appendChild(option);
+    });
+    if (currentValue) select.value = currentValue;
+  } catch (e) {
+    console.error("Не удалось загрузить список гостей", e);
+  }
+}
+
+// ---------- Обновление всех данных ----------
 async function refresh() {
-  renderStats(await fetchJson("/api/admin/stats"));
-  renderInvitations((await fetchJson("/api/admin/invitations")).invitations);
-  renderResponses((await fetchJson("/api/admin/responses")).responses);
-  renderPhotos((await fetchJson("/api/admin/photos")).photos);
-  renderProgram((await fetchJson("/api/admin/program")).program);
+  await Promise.all([
+    fetchJson("/api/admin/stats").then(renderStats),
+    fetchJson("/api/admin/invitations").then(data => renderInvitations(data.invitations)),
+    fetchJson("/api/admin/responses").then(data => renderResponses(data.responses)),
+  ]);
+  await populateGuestSelect();
 }
 
+// ---------- Обработчики форм ----------
+
+// Приглашения
 invitationForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const payload = {
@@ -148,54 +157,48 @@ invitationForm.addEventListener("submit", async (event) => {
   }
 });
 
-programForm.addEventListener("submit", async (event) => {
+// Ответы
+responseForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const invitationId = responseInvitationSelect.value;
+  if (!invitationId) {
+    alert("Выберите гостя");
+    return;
+  }
   const payload = {
-    event_time: programTimeInput.value.trim(),
-    title: programTitleInput.value.trim(),
-    sort_order: 100,
+    will_come: responseWillCome.value,
+    comment_will_come: responseComment.value.trim(),
+    allergies: responseAllergies.value === "yes",
+    allergies_details: responseAllergiesDetails.value.trim(),
+    alcohol: responseAlcohol.value === "yes",
+    additional_info: responseAdditionalInfo.value.trim(),
   };
   try {
-    const id = programItemIdInput.value;
+    const id = responseIdInput.value;
     if (id) {
-      await fetchJson(`/api/admin/program/${id}`, {
+      await fetchJson(`/api/admin/responses/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
     } else {
-      await fetchJson("/api/admin/program", {
+      await fetchJson(`/api/admin/responses?invitation_id=${invitationId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
     }
-    programForm.reset();
-    programItemIdInput.value = "";
+    responseForm.reset();
+    responseIdInput.value = "";
     await refresh();
   } catch (error) {
     alert(error.message);
   }
 });
 
-photoForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const file = photoFileInput.files[0];
-  if (!file) return;
-  const formData = new FormData();
-  formData.append("file", file);
-  try {
-    await fetchJson("/api/admin/photos", {
-      method: "POST",
-      body: formData,
-    });
-    photoForm.reset();
-    await refresh();
-  } catch (error) {
-    alert(error.message);
-  }
-});
+// ---------- Клики по таблицам ----------
 
+// Приглашения
 invitationsList.addEventListener("click", async (event) => {
   const editId = event.target.dataset.edit;
   const deleteId = event.target.dataset.delete;
@@ -217,32 +220,33 @@ invitationsList.addEventListener("click", async (event) => {
   }
 });
 
-photosList.addEventListener("click", async (event) => {
-  const deleteId = event.target.dataset.deletePhoto;
-  if (deleteId && confirm("Удалить фотографию?")) {
-    await fetchJson(`/api/admin/photos/${deleteId}`, { method: "DELETE" });
-    await refresh();
-  }
-});
-
-programList.addEventListener("click", async (event) => {
-  const editId = event.target.dataset.editProgram;
-  const deleteId = event.target.dataset.deleteProgram;
+// Ответы
+responsesList.addEventListener("click", async (event) => {
+  const editId = event.target.dataset.editResponse;
+  const deleteId = event.target.dataset.deleteResponse;
   if (editId) {
-    const program = (await fetchJson("/api/admin/program")).program;
-    const item = program.find((entry) => entry.id === Number(editId));
+    const responses = (await fetchJson("/api/admin/responses")).responses;
+    const item = responses.find((r) => r.id === Number(editId));
     if (item) {
-      programItemIdInput.value = item.id;
-      programTimeInput.value = item.event_time;
-      programTitleInput.value = item.title;
+      responseIdInput.value = item.id;
+      responseInvitationSelect.value = item.invitation_id;
+      responseWillCome.value = item.will_come;
+      responseComment.value = item.comment_will_come || "";
+      responseAllergies.value = item.allergies ? "yes" : "no";
+      responseAllergiesDetails.value = item.allergies_details || "";
+      responseAlcohol.value = item.alcohol ? "yes" : "no";
+      responseAdditionalInfo.value = item.additional_info || "";
     }
   }
-  if (deleteId && confirm("Удалить этап программы?")) {
-    await fetchJson(`/api/admin/program/${deleteId}`, { method: "DELETE" });
-    await refresh();
+  if (deleteId) {
+    if (confirm("Удалить ответ?")) {
+      await fetchJson(`/api/admin/responses/${deleteId}`, { method: "DELETE" });
+      await refresh();
+    }
   }
 });
 
+// ---------- Инициализация ----------
 refresh().catch((error) => {
   document.body.innerHTML = `<div style="padding:40px;"><h2>Ошибка доступа</h2><p>${error.message}</p><p>Проверьте учетные данные администратора.</p></div>`;
 });

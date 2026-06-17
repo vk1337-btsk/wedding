@@ -129,6 +129,9 @@
                         .t396__filter {
                           background-color: transparent;
                         }
+                        .hidden {
+                          display: none !important;
+                        }
 
                         /* ---------- Заставка (rec540056894) ---------- */
                         #rec540056894 .t396__artboard,
@@ -1276,6 +1279,30 @@
                             transform: translateX(-50%) !important;
                           }
                         }
+                        #rec541740449 .tn-elem[data-elem-id="1674640410832"] {
+                          top: 390px !important;
+                          left: 50% !important;
+                          width: min(444px, calc(100% - 40px)) !important;
+                          transform: translateX(-50%) !important;
+                          z-index: 20;
+                        }
+                        @media screen and (max-width: 960px) {
+                          #rec541740449 .tn-elem[data-elem-id="1674640410832"] {
+                            top: 420px !important;
+                            width: min(444px, calc(100% - 40px)) !important;
+                          }
+                        }
+                        @media screen and (max-width: 640px) {
+                          #rec541740449 .tn-elem[data-elem-id="1674640410832"] {
+                            top: 410px !important;
+                            width: calc(100% - 40px) !important;
+                          }
+                        }
+                        @media screen and (max-width: 480px) {
+                          #rec541740449 .tn-elem[data-elem-id="1674640410832"] {
+                            top: 390px !important;
+                          }
+                        }
                         /* ---------- Настройка видео внутри формы ---------- */
                         #rec541740449 #recVideoBlock {
                           position: relative;
@@ -1466,7 +1493,7 @@
       <!-- ========== БЛОК "Сейчас будет что-то интересное..." ========== -->
       <div
         id="rec600785773"
-        class="r t-rec t-rec_pt_45 t-rec_pb_45"
+        class="r t-rec t-rec_pt_45 t-rec_pb_45 hidden"
         style="padding-top: 45px; padding-bottom: 45px"
         data-animationappear="off"
         data-record-type="396"
@@ -1582,8 +1609,8 @@
               <div class="tn-atom">
                 <img
                   class="tn-atom__img t-img"
-                  src="photos/logo.png"
-                  data-original="photos/logo.png"
+                  src="/photos/logo.png"
+                  data-original="/photos/logo.png"
                   alt="Фото жениха и невесты"
                   imgfield="tn_img_1627994724304"
                 />
@@ -2326,12 +2353,12 @@
             class="t396__artboard"
             data-artboard-recid="541740449"
             data-artboard-screens="320,480,640,960,1200"
-            data-artboard-height="850"
+            data-artboard-height="1020"
             data-artboard-valign="center"
             data-artboard-upscale="grid"
-            data-artboard-height-res-320="1100"
-            data-artboard-height-res-480="1200"
-            data-artboard-height-res-640="1300"
+            data-artboard-height-res-320="1120"
+            data-artboard-height-res-480="1120"
+            data-artboard-height-res-640="1120"
           >
             <div class="t396__carrier" data-artboard-recid="541740449"></div>
             <div class="t396__filter" data-artboard-recid="541740449"></div>
@@ -2546,8 +2573,8 @@
                 <div class="t578__imgwrapper t-margin_auto">
                   <div
                     class="t578__bgimg t-margin_auto t-bgimg"
-                    src="photos/organizator.jpg"
-                    data-original="photos/organizator.jpg"
+                    src="/photos/organizator.jpg"
+                    data-original="/photos/organizator.jpg"
                     alt="Фото жениха и невесты"
                     bgimgfield="img"
                     style="
@@ -2788,5 +2815,223 @@
         </script>
       </div>
     </div>
+    <script>
+      (function () {
+        var inviteCode = getInviteCode();
+
+        document.addEventListener("DOMContentLoaded", function () {
+          renderResponseForm();
+          setTimeout(renderResponseForm, 700);
+          setTimeout(renderResponseForm, 2000);
+          watchResponseForm();
+          if (!inviteCode) {
+            showFallback();
+            return;
+          }
+          showOnly("rec540056894");
+          loadInvitation(inviteCode);
+        });
+
+        function getInviteCode() {
+          var parts = window.location.pathname.split("/").filter(Boolean);
+          var inviteIndex = parts.indexOf("invite");
+          if (inviteIndex !== -1 && parts[inviteIndex + 1]) {
+            return decodeURIComponent(parts[inviteIndex + 1]);
+          }
+          return new URLSearchParams(window.location.search).get("code");
+        }
+
+        function allRecords() {
+          return Array.prototype.slice.call(document.querySelectorAll(".t-rec[id]"));
+        }
+
+        function showOnly(recordId) {
+          allRecords().forEach(function (record) {
+            var isCurrent = record.id === recordId;
+            record.classList.toggle("hidden", !isCurrent);
+            if (isCurrent) {
+              record.style.display = "";
+              record.style.opacity = "";
+            }
+          });
+        }
+
+        function showFallback() {
+          showOnly("rec600785773");
+        }
+
+        function showInvitation() {
+          allRecords().forEach(function (record) {
+            var isGreeting = record.id === "rec540056894";
+            record.classList.toggle("hidden", isGreeting);
+            if (!isGreeting) {
+              record.style.display = "";
+              record.style.opacity = "";
+            }
+          });
+        }
+
+        function setGreeting(guestName) {
+          var greeting = document.querySelector(".tn-elem__5400568941627994674318 .tn-atom");
+          if (!greeting || !guestName) return;
+          greeting.textContent = guestName.trim();
+          greeting.style.opacity = "0";
+          greeting.style.transition = "opacity 1800ms ease";
+          setTimeout(function () {
+            greeting.style.opacity = "1";
+          }, 80);
+        }
+
+        async function loadInvitation(code) {
+          try {
+            var response = await fetch("/api/invite/" + encodeURIComponent(code));
+            if (!response.ok) {
+              showFallback();
+              return;
+            }
+            var data = await response.json();
+            setGreeting(data.invitation && data.invitation.invitation_text);
+            showOnly("rec540056894");
+            setTimeout(function () {
+              showInvitation();
+              window.scrollTo({ top: 0, behavior: "auto" });
+            }, 3600);
+          } catch (error) {
+            showFallback();
+          }
+        }
+
+        function renderResponseForm() {
+          var holder = document.querySelector("#rec541740449 .tn-atom__form");
+          if (!holder || (holder.dataset.customRsvpReady === "true" && holder.querySelector("#customRsvpForm"))) return;
+          holder.dataset.customRsvpReady = "true";
+          holder.innerHTML =
+            '<form id="customRsvpForm" class="t-form custom-rsvp-form">' +
+            '  <div class="t-input-group">' +
+            '    <div class="t-input-title">Вы придёте?</div>' +
+            '    <label class="custom-rsvp-radio"><input class="t-radio custom-rsvp-native-radio" type="radio" name="will_come" value="yes" required /> <span>Да, конечно</span></label>' +
+            '    <label class="custom-rsvp-radio"><input class="t-radio custom-rsvp-native-radio" type="radio" name="will_come" value="no" required /> <span>Нет, к сожалению</span></label>' +
+            '  </div>' +
+            '  <div class="t-input-group">' +
+            '    <label class="t-input-title" for="comment_will_come">Пояснение</label>' +
+            '    <textarea id="comment_will_come" class="t-input" name="comment_will_come" rows="3"></textarea>' +
+            '  </div>' +
+            '  <div class="t-input-group">' +
+            '    <div class="t-input-title">Есть ли у вас аллергии?</div>' +
+            '    <label class="custom-rsvp-radio"><input class="t-radio custom-rsvp-native-radio" type="radio" name="allergies" value="yes" required /> <span>Да</span></label>' +
+            '    <label class="custom-rsvp-radio"><input class="t-radio custom-rsvp-native-radio" type="radio" name="allergies" value="no" required /> <span>Нет</span></label>' +
+            '  </div>' +
+            '  <div class="t-input-group hidden" id="allergiesDetailsGroup">' +
+            '    <label class="t-input-title" for="allergies_details">Описание аллергий</label>' +
+            '    <textarea id="allergies_details" class="t-input" name="allergies_details" rows="3"></textarea>' +
+            '  </div>' +
+            '  <div class="t-input-group">' +
+            '    <div class="t-input-title">Будете ли вы пить алкоголь?</div>' +
+            '    <label class="custom-rsvp-radio"><input class="t-radio custom-rsvp-native-radio" type="radio" name="alcohol" value="yes" required /> <span>Да</span></label>' +
+            '    <label class="custom-rsvp-radio"><input class="t-radio custom-rsvp-native-radio" type="radio" name="alcohol" value="no" required /> <span>Нет</span></label>' +
+            '  </div>' +
+            '  <div class="t-input-group">' +
+            '    <label class="t-input-title" for="additional_info">Дополнительная информация</label>' +
+            '    <textarea id="additional_info" class="t-input" name="additional_info" rows="4"></textarea>' +
+            '  </div>' +
+            '  <button class="t-btn" type="submit">Отправить</button>' +
+            '  <div class="custom-rsvp-status" aria-live="polite"></div>' +
+            '</form>';
+
+          injectFormStyles();
+          bindResponseForm(holder.querySelector("#customRsvpForm"));
+        }
+
+        function watchResponseForm() {
+          var block = document.querySelector("#rec541740449");
+          if (!block || !window.MutationObserver) return;
+          var pending = false;
+          new MutationObserver(function () {
+            if (pending) return;
+            pending = true;
+            setTimeout(function () {
+              pending = false;
+              renderResponseForm();
+            }, 50);
+          }).observe(block, { childList: true, subtree: true });
+        }
+
+        function injectFormStyles() {
+          if (document.getElementById("customRsvpStyles")) return;
+          var style = document.createElement("style");
+          style.id = "customRsvpStyles";
+          style.textContent =
+            ".custom-rsvp-form{font-family:TildaSans,Arial,sans-serif;color:#403131}" +
+            ".custom-rsvp-form .t-input-group{margin-bottom:22px}" +
+            ".custom-rsvp-form .t-input-title{display:block;margin-bottom:8px;color:#403131;font-size:16px;font-weight:400}" +
+            ".custom-rsvp-form .t-input{box-sizing:border-box;width:100%;min-height:50px;padding:12px 14px;border:1px solid #403131;border-radius:10px;color:#403131;font-size:16px;background:#fff;resize:vertical}" +
+            ".custom-rsvp-radio{display:flex!important;align-items:center;gap:9px;margin:8px 0;color:#403131;font-size:16px;line-height:1.4;cursor:pointer}" +
+            ".custom-rsvp-native-radio{appearance:auto!important;-webkit-appearance:radio!important;display:inline-block!important;position:static!important;opacity:1!important;visibility:visible!important;width:16px!important;height:16px!important;min-width:16px!important;margin:0!important;vertical-align:middle!important;accent-color:#403131}" +
+            ".custom-rsvp-radio span{display:inline!important}" +
+            ".custom-rsvp-form .t-btn{width:100%;height:50px;border:1px solid #403131;border-radius:10px;background:transparent;color:#403131;font-family:ZAG,TildaSans,Arial,sans-serif;font-size:16px;font-weight:600;cursor:pointer}" +
+            ".custom-rsvp-form .t-btn:disabled{opacity:.55;cursor:default}" +
+            ".custom-rsvp-status{margin-top:14px;font-size:16px;line-height:1.45;color:#403131}" +
+            ".custom-rsvp-status.error{color:#a33}";
+          document.head.appendChild(style);
+        }
+
+        function bindResponseForm(form) {
+          if (!form) return;
+          var status = form.querySelector(".custom-rsvp-status");
+          var allergyGroup = form.querySelector("#allergiesDetailsGroup");
+
+          form.addEventListener("change", function (event) {
+            if (event.target.name === "allergies") {
+              allergyGroup.classList.toggle("hidden", event.target.value !== "yes");
+            }
+          });
+
+          form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            if (!inviteCode) {
+              setStatus(status, "Ссылка приглашения не найдена.", true);
+              return;
+            }
+
+            var submitButton = form.querySelector('button[type="submit"]');
+            var formData = new FormData(form);
+            var payload = {
+              will_come: formData.get("will_come"),
+              comment_will_come: String(formData.get("comment_will_come") || "").trim(),
+              allergies: formData.get("allergies") === "yes",
+              allergies_details: String(formData.get("allergies_details") || "").trim(),
+              alcohol: formData.get("alcohol") === "yes",
+              additional_info: String(formData.get("additional_info") || "").trim(),
+            };
+
+            submitButton.disabled = true;
+            setStatus(status, "Отправляем ответ...", false);
+            try {
+              var response = await fetch("/api/respond/" + encodeURIComponent(inviteCode), {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              if (!response.ok) {
+                var errorBody = await response.json().catch(function () {
+                  return {};
+                });
+                throw new Error(errorBody.detail || "Не удалось отправить ответ.");
+              }
+              form.innerHTML = '<div class="custom-rsvp-status">Ваш ответ успешно отправлен!</div>';
+            } catch (error) {
+              setStatus(status, error.message, true);
+              submitButton.disabled = false;
+            }
+          });
+        }
+
+        function setStatus(element, message, isError) {
+          if (!element) return;
+          element.textContent = message;
+          element.classList.toggle("error", Boolean(isError));
+        }
+      })();
+    </script>
   </body>
 </html>

@@ -1,7 +1,6 @@
 # app\crud.py
 import sqlite3
 from datetime import datetime
-from pathlib import Path
 from secrets import token_urlsafe
 
 from .db import get_connection
@@ -74,51 +73,84 @@ def delete_invitation(invitation_id: int) -> None:
     conn.commit()
 
 
-def get_response_for_invitation(invitation_id: int) -> dict | None:
+def get_response(response_id: int) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM responses WHERE invitation_id = ?", (invitation_id,))
+    cursor.execute("SELECT * FROM responses WHERE id = ?", (response_id,))
     return _row_to_dict(cursor.fetchone())
+
+
+def get_responses_for_invitation(invitation_id: int) -> list[dict]:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM responses WHERE invitation_id = ? ORDER BY answered_at DESC",
+        (invitation_id,),
+    )
+    return [dict(row) for row in cursor.fetchall()]
 
 
 def create_response(
     invitation_id: int,
-    attendance: bool,
-    guest_count: int | None,
-    children: bool,
-    vegetarian: bool,
-    allergies: str | None,
-    phone: str | None,
-    telegram: str | None,
-    comment: str | None,
+    will_come: str,
+    comment_will_come: str | None,
+    allergies: bool | None,
+    allergies_details: str | None,
+    alcohol: bool | None,
+    additional_info: str | None,
 ) -> dict:
     conn = get_connection()
     cursor = conn.cursor()
     answered_at = datetime.utcnow().isoformat()
     cursor.execute(
-        "INSERT INTO responses (invitation_id, attendance, guest_count, children, vegetarian, allergies, phone, telegram, comment, answered_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        """
+        INSERT INTO responses (
+            invitation_id,
+            will_come,
+            comment_will_come,
+            allergies,
+            allergies_details,
+            alcohol,
+            additional_info,
+            answered_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
         (
             invitation_id,
-            int(attendance),
-            guest_count,
-            int(children),
-            int(vegetarian),
-            allergies or "",
-            phone or "",
-            telegram or "",
-            comment or "",
+            will_come,
+            comment_will_come or "",
+            None if allergies is None else int(allergies),
+            allergies_details or "",
+            None if alcohol is None else int(alcohol),
+            additional_info or "",
             answered_at,
         ),
     )
     conn.commit()
-    return get_response_for_invitation(invitation_id)
+    return get_response(cursor.lastrowid)
 
 
 def list_responses() -> list[dict]:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT r.*, i.guest_name FROM responses r JOIN invitations i ON r.invitation_id = i.id ORDER BY r.answered_at DESC"
+        """
+        SELECT
+            r.id,
+            r.invitation_id,
+            i.guest_name,
+            r.will_come,
+            r.comment_will_come,
+            r.allergies,
+            r.allergies_details,
+            r.alcohol,
+            r.additional_info,
+            r.answered_at
+        FROM responses r
+        JOIN invitations i ON r.invitation_id = i.id
+        ORDER BY r.answered_at DESC
+        """
     )
     return [dict(row) for row in cursor.fetchall()]
 
@@ -128,9 +160,9 @@ def count_stats() -> dict:
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM invitations")
     total = cursor.fetchone()[0]
-    cursor.execute("SELECT COUNT(*) FROM responses WHERE attendance = 1")
+    cursor.execute("SELECT COUNT(*) FROM responses WHERE will_come = 'yes'")
     confirmed = cursor.fetchone()[0]
-    cursor.execute("SELECT COUNT(*) FROM responses WHERE attendance = 0")
+    cursor.execute("SELECT COUNT(*) FROM responses WHERE will_come = 'no'")
     declined = cursor.fetchone()[0]
     cursor.execute(
         "SELECT COUNT(*) FROM invitations WHERE id NOT IN (SELECT invitation_id FROM responses)"
@@ -144,83 +176,54 @@ def count_stats() -> dict:
     }
 
 
-def list_photos() -> list[dict]:
+def get_response(response_id: int) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM photos ORDER BY sort_order ASC, uploaded_at DESC")
-    return [dict(row) for row in cursor.fetchall()]
-
-
-def add_photo(filename: str, original_filename: str, sort_order: int) -> dict:
-    conn = get_connection()
-    cursor = conn.cursor()
-    uploaded_at = datetime.utcnow().isoformat()
-    cursor.execute(
-        "INSERT INTO photos (filename, original_filename, sort_order, uploaded_at) VALUES (?, ?, ?, ?)",
-        (filename, original_filename, sort_order, uploaded_at),
-    )
-    conn.commit()
-    photo_id = cursor.lastrowid
-    cursor.execute("SELECT * FROM photos WHERE id = ?", (photo_id,))
+    cursor.execute("SELECT * FROM responses WHERE id = ?", (response_id,))
     return _row_to_dict(cursor.fetchone())
 
 
-def delete_photo(photo_id: int) -> None:
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM photos WHERE id = ?", (photo_id,))
-    conn.commit()
-
-
-def update_photo_order(photo_id: int, sort_order: int) -> dict | None:
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE photos SET sort_order = ? WHERE id = ?", (sort_order, photo_id)
-    )
-    conn.commit()
-    cursor.execute("SELECT * FROM photos WHERE id = ?", (photo_id,))
-    return _row_to_dict(cursor.fetchone())
-
-
-def list_program_items() -> list[dict]:
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM program_items ORDER BY sort_order ASC")
-    return [dict(row) for row in cursor.fetchall()]
-
-
-def add_program_item(event_time: str, title: str, sort_order: int) -> dict:
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO program_items (event_time, title, sort_order) VALUES (?, ?, ?)",
-        (event_time, title, sort_order),
-    )
-    conn.commit()
-    return _row_to_dict(
-        cursor.execute(
-            "SELECT * FROM program_items WHERE id = ?", (cursor.lastrowid,)
-        ).fetchone()
-    )
-
-
-def update_program_item(
-    item_id: int, event_time: str, title: str, sort_order: int
+def update_response(
+    response_id: int,
+    will_come: str,
+    comment_will_come: str | None,
+    allergies: bool | None,
+    allergies_details: str | None,
+    alcohol: bool | None,
+    additional_info: str | None,
 ) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
+    answered_at = datetime.utcnow().isoformat()  # обновим время
     cursor.execute(
-        "UPDATE program_items SET event_time = ?, title = ?, sort_order = ? WHERE id = ?",
-        (event_time, title, sort_order, item_id),
+        """
+        UPDATE responses
+        SET will_come = ?,
+            comment_will_come = ?,
+            allergies = ?,
+            allergies_details = ?,
+            alcohol = ?,
+            additional_info = ?,
+            answered_at = ?
+        WHERE id = ?
+        """,
+        (
+            will_come,
+            comment_will_come or "",
+            None if allergies is None else int(allergies),
+            allergies_details or "",
+            None if alcohol is None else int(alcohol),
+            additional_info or "",
+            answered_at,
+            response_id,
+        ),
     )
     conn.commit()
-    cursor.execute("SELECT * FROM program_items WHERE id = ?", (item_id,))
-    return _row_to_dict(cursor.fetchone())
+    return get_response(response_id)
 
 
-def delete_program_item(item_id: int) -> None:
+def delete_response(response_id: int) -> None:
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM program_items WHERE id = ?", (item_id,))
+    cursor.execute("DELETE FROM responses WHERE id = ?", (response_id,))
     conn.commit()

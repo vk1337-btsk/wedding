@@ -1,6 +1,5 @@
 # app\schemas.py
-from datetime import datetime
-from typing import List
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -21,46 +20,24 @@ class InvitationOut(InvitationBase):
 
 
 class ResponseCreate(BaseModel):
-    attendance: bool
-    guest_count: int | None = None
-    children: bool
-    vegetarian: bool
-    allergies: str | None = ""
-    phone: str | None = ""
-    telegram: str | None = ""
-    comment: str | None = ""
+    will_come: Literal["yes", "no"]
+    comment_will_come: str | None = ""
+    allergies: bool | None = None
+    allergies_details: str | None = ""
+    alcohol: bool | None = None
+    additional_info: str | None = ""
 
 
 class ResponseOut(BaseModel):
     id: int
     invitation_id: int
-    attendance: bool
-    guest_count: int | None = None
-    children: bool
-    vegetarian: bool
-    allergies: str | None = ""
-    phone: str | None = ""
-    telegram: str | None = ""
-    comment: str | None = ""
+    will_come: Literal["yes", "no"] | None = None
+    comment_will_come: str | None = ""
+    allergies: bool | None = None
+    allergies_details: str | None = ""
+    alcohol: bool | None = None
+    additional_info: str | None = ""
     answered_at: str
-
-
-class PhotoOut(BaseModel):
-    id: int
-    filename: str
-    original_filename: str
-    sort_order: int
-    uploaded_at: str
-
-
-class ProgramItemBase(BaseModel):
-    event_time: str = Field(..., min_length=1)
-    title: str = Field(..., min_length=1)
-
-
-class ProgramItemOut(ProgramItemBase):
-    id: int
-    sort_order: int
 
 
 class StatsOut(BaseModel):

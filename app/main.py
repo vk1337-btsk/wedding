@@ -1,8 +1,9 @@
 # app\main.py
+import logging
 from pathlib import Path
 from secrets import compare_digest
 
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, status
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
@@ -10,12 +11,14 @@ from fastapi.staticfiles import StaticFiles
 from . import crud, email_utils
 from .config import settings
 from .db import init_db
-from .schemas import InvitationCreate, ResponseCreate
-from .seed import seed_data
+from .schemas import InvitationCreate, ResponseCreate, ResponseOut
 
 app = FastAPI(title="Wedding Invitation")
 security = HTTPBasic()
+
+
 static_dir = Path(__file__).resolve().parent / "static"
+app.mount("/static", StaticFiles(directory=static_dir), name="static")  # <-- добавить
 app.mount("/photos", StaticFiles(directory="app/static/photos"), name="photos")
 
 
@@ -34,10 +37,6 @@ def get_admin_user(credentials: HTTPBasicCredentials = Depends(security)) -> str
 @app.on_event("startup")
 def startup_event() -> None:
     init_db()
-    try:
-        seed_data()
-    except Exception:
-        pass
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -55,76 +54,36 @@ def admin_page(_: str = Depends(get_admin_user)) -> FileResponse:
     return FileResponse(static_dir / "admin.html")
 
 
-@app.get("/api/site")
-def site_info() -> dict:
-    return {
-        "wedding_date": settings.wedding_date,
-        "venue_name": settings.venue_name,
-        "venue_address": settings.venue_address,
-        "venue_time": settings.venue_time,
-        "map_point": settings.map_point,
-        "base_url": settings.base_url,
-    }
-
-
 @app.get("/api/invite/{code}")
 def invite_info(code: str) -> dict:
     invitation = crud.get_invitation_by_code(code)
     if invitation is None:
         raise HTTPException(status_code=404, detail="Invitation not found")
-    response = crud.get_response_for_invitation(invitation["id"])
+    responses = crud.get_responses_for_invitation(invitation["id"])
     return {
         "invitation": invitation,
-        "response": response,
-        "photos": [
-            {**photo, "url": f"/static/photos/{photo['filename']}"}
-            for photo in crud.list_photos()
-        ],
-        "program": crud.list_program_items(),
+        "responses": responses,
     }
 
 
-@app.get("/api/program")
-def program_list() -> dict:
-    return {"program": crud.list_program_items()}
-
-
-@app.get("/api/photos")
-def photos_list() -> dict:
-    return {
-        "photos": [
-            {**photo, "url": f"/static/photos/{photo['filename']}"}
-            for photo in crud.list_photos()
-        ]
-    }
-
-
-@app.post("/api/respond/{code}")
+@app.post("/api/respond/{code}", response_model=ResponseOut)
 def submit_response(code: str, payload: ResponseCreate) -> dict:
     invitation = crud.get_invitation_by_code(code)
     if invitation is None:
         raise HTTPException(status_code=404, detail="Invitation not found")
-    if crud.get_response_for_invitation(invitation["id"]):
-        raise HTTPException(status_code=409, detail="Response already received")
-    if payload.attendance and (payload.guest_count is None or payload.guest_count < 1):
-        raise HTTPException(
-            status_code=400, detail="Guest count must be specified for attendance"
-        )
     response = crud.create_response(
         invitation_id=invitation["id"],
-        attendance=payload.attendance,
-        guest_count=payload.guest_count,
-        children=payload.children,
-        vegetarian=payload.vegetarian,
+        will_come=payload.will_come,
+        comment_will_come=payload.comment_will_come,
         allergies=payload.allergies,
-        phone=payload.phone,
-        telegram=payload.telegram,
-        comment=payload.comment,
+        allergies_details=payload.allergies_details,
+        alcohol=payload.alcohol,
+        additional_info=payload.additional_info,
     )
     try:
         email_utils.send_response_email(invitation, response)
-    except Exception:
-        pass
+    except Exception as error:
+        logging.error(f"Failed to send email: {error}")
     return response
 
 
@@ -173,64 +132,46 @@ def admin_stats(_: str = Depends(get_admin_user)) -> dict:
     return crud.count_stats()
 
 
-@app.get("/api/admin/photos")
-def admin_photos(_: str = Depends(get_admin_user)) -> dict:
-    return {
-        "photos": [
-            {**photo, "url": f"/static/photos/{photo['filename']}"}
-            for photo in crud.list_photos()
-        ]
-    }
-
-
-@app.post("/api/admin/photos")
-def admin_upload_photo(
-    file: UploadFile = File(...), _: str = Depends(get_admin_user)
+@app.post("/api/admin/responses")
+def admin_create_response(
+    invitation_id: int, payload: ResponseCreate, _: str = Depends(get_admin_user)
 ) -> dict:
-    photo_dir = settings.photo_dir
-    photo_dir.mkdir(parents=True, exist_ok=True)
-    filename = f"{crud.generate_code(10)}_{Path(str(file.filename)).name}"
-    save_path = photo_dir / filename
-    with save_path.open("wb") as stream:
-        stream.write(file.file.read())
-    existing = crud.list_photos()
-    sort_order = max((photo["sort_order"] for photo in existing), default=0) + 1
-    photo = crud.add_photo(filename, str(file.filename), sort_order)
-    return {**photo, "url": f"/static/photos/{photo['filename']}"}
-
-
-@app.delete("/api/admin/photos/{photo_id}")
-def admin_delete_photo(photo_id: int, _: str = Depends(get_admin_user)) -> dict:
-    crud.delete_photo(photo_id)
-    return {"status": "deleted"}
-
-
-@app.get("/api/admin/program")
-def admin_program(_: str = Depends(get_admin_user)) -> dict:
-    return {"program": crud.list_program_items()}
-
-
-@app.post("/api/admin/program")
-def admin_add_program(payload: dict, _: str = Depends(get_admin_user)) -> dict:
-    program_item = crud.add_program_item(
-        payload["event_time"], payload["title"], payload.get("sort_order", 100)
+    # Проверим, существует ли приглашение
+    invitation = crud.get_invitation(invitation_id)
+    if invitation is None:
+        raise HTTPException(status_code=404, detail="Invitation not found")
+    response = crud.create_response(
+        invitation_id=invitation_id,
+        will_come=payload.will_come,
+        comment_will_come=payload.comment_will_come,
+        allergies=payload.allergies,
+        allergies_details=payload.allergies_details,
+        alcohol=payload.alcohol,
+        additional_info=payload.additional_info,
     )
-    return program_item
+    return response
 
 
-@app.put("/api/admin/program/{item_id}")
-def admin_update_program(
-    item_id: int, payload: dict, _: str = Depends(get_admin_user)
+@app.put("/api/admin/responses/{response_id}")
+def admin_update_response(
+    response_id: int, payload: ResponseCreate, _: str = Depends(get_admin_user)
 ) -> dict:
-    program_item = crud.update_program_item(
-        item_id, payload["event_time"], payload["title"], payload.get("sort_order", 100)
+    # В crud.py нужно добавить функцию update_response
+    response = crud.update_response(
+        response_id=response_id,
+        will_come=payload.will_come,
+        comment_will_come=payload.comment_will_come,
+        allergies=payload.allergies,
+        allergies_details=payload.allergies_details,
+        alcohol=payload.alcohol,
+        additional_info=payload.additional_info,
     )
-    if program_item is None:
-        raise HTTPException(status_code=404, detail="Program item not found")
-    return program_item
+    if response is None:
+        raise HTTPException(status_code=404, detail="Response not found")
+    return response
 
 
-@app.delete("/api/admin/program/{item_id}")
-def admin_delete_program(item_id: int, _: str = Depends(get_admin_user)) -> dict:
-    crud.delete_program_item(item_id)
+@app.delete("/api/admin/responses/{response_id}")
+def admin_delete_response(response_id: int, _: str = Depends(get_admin_user)) -> dict:
+    crud.delete_response(response_id)
     return {"status": "deleted"}
