@@ -1,5 +1,6 @@
 # app\main.py
 import logging
+from contextlib import asynccontextmanager
 from pathlib import Path
 from secrets import compare_digest
 
@@ -13,12 +14,29 @@ from .config import settings
 from .db import init_db
 from .schemas import InvitationCreate, ResponseCreate, ResponseOut
 
-app = FastAPI(title="Wedding Invitation")
+
+# === LIFESPAN (вместо @app.on_event) ===
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # STARTUP - код, который был в startup_event
+    logging.info("🚀 Application starting up...")
+    init_db()  # Инициализация базы данных
+    logging.info("✅ Database initialized")
+
+    yield  # Здесь приложение работает и обрабатывает запросы
+
+    # SHUTDOWN - если нужно что-то закрыть
+    logging.info("🛑 Application shutting down...")
+    # Здесь можно добавить закрытие соединений, если нужно
+
+
+# Создаем приложение с lifespan
+app = FastAPI(title="Wedding Invitation", lifespan=lifespan)  # <-- Добавляем lifespan
+
 security = HTTPBasic()
 
-
 static_dir = Path(__file__).resolve().parent / "static"
-app.mount("/static", StaticFiles(directory=static_dir), name="static")  # <-- добавить
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 app.mount("/photos", StaticFiles(directory="app/static/photos"), name="photos")
 
 
@@ -32,11 +50,6 @@ def get_admin_user(credentials: HTTPBasicCredentials = Depends(security)) -> str
             headers={"WWW-Authenticate": "Basic"},
         )
     return credentials.username
-
-
-@app.on_event("startup")
-def startup_event() -> None:
-    init_db()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -93,31 +106,21 @@ def admin_invitations(_: str = Depends(get_admin_user)) -> dict:
 
 
 @app.post("/api/admin/invitations")
-def admin_create_invitation(
-    payload: InvitationCreate, _: str = Depends(get_admin_user)
-) -> dict:
-    invitation = crud.create_invitation(
-        payload.guest_name, payload.invitation_text, payload.invite_code
-    )
+def admin_create_invitation(payload: InvitationCreate, _: str = Depends(get_admin_user)) -> dict:
+    invitation = crud.create_invitation(payload.guest_name, payload.invitation_text, payload.invite_code)
     return invitation
 
 
 @app.put("/api/admin/invitations/{invitation_id}")
-def admin_update_invitation(
-    invitation_id: int, payload: InvitationCreate, _: str = Depends(get_admin_user)
-) -> dict:
-    invitation = crud.update_invitation(
-        invitation_id, payload.guest_name, payload.invitation_text
-    )
+def admin_update_invitation(invitation_id: int, payload: InvitationCreate, _: str = Depends(get_admin_user)) -> dict:
+    invitation = crud.update_invitation(invitation_id, payload.guest_name, payload.invitation_text)
     if invitation is None:
         raise HTTPException(status_code=404, detail="Invitation not found")
     return invitation
 
 
 @app.delete("/api/admin/invitations/{invitation_id}")
-def admin_delete_invitation(
-    invitation_id: int, _: str = Depends(get_admin_user)
-) -> dict:
+def admin_delete_invitation(invitation_id: int, _: str = Depends(get_admin_user)) -> dict:
     crud.delete_invitation(invitation_id)
     return {"status": "deleted"}
 
@@ -133,9 +136,7 @@ def admin_stats(_: str = Depends(get_admin_user)) -> dict:
 
 
 @app.post("/api/admin/responses")
-def admin_create_response(
-    invitation_id: int, payload: ResponseCreate, _: str = Depends(get_admin_user)
-) -> dict:
+def admin_create_response(invitation_id: int, payload: ResponseCreate, _: str = Depends(get_admin_user)) -> dict:
     # Проверим, существует ли приглашение
     invitation = crud.get_invitation(invitation_id)
     if invitation is None:
@@ -153,9 +154,7 @@ def admin_create_response(
 
 
 @app.put("/api/admin/responses/{response_id}")
-def admin_update_response(
-    response_id: int, payload: ResponseCreate, _: str = Depends(get_admin_user)
-) -> dict:
+def admin_update_response(response_id: int, payload: ResponseCreate, _: str = Depends(get_admin_user)) -> dict:
     # В crud.py нужно добавить функцию update_response
     response = crud.update_response(
         response_id=response_id,

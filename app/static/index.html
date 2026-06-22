@@ -41,7 +41,7 @@
       content="https://static.tildacdn.com/tild6237-6565-4537-b635-333738623638/182-1823686_wedding-.png"
     />
 
-    <!-- Базовые стили и скрипты Tilda (оставлены только необходимые) -->
+    <!-- Базовые стили и скрипты Tilda -->
     <script src="https://neo.tildacdn.com/js/tilda-fallback-1.0.min.js" async charset="utf-8"></script>
     <link rel="stylesheet" href="https://static.tildacdn.com/css/tilda-grid-3.0.min.css" type="text/css" media="all" />
     <link
@@ -113,7 +113,7 @@
     <script src="https://static.tildacdn.com/js/tilda-zero-fixed-1.0.min.js" charset="utf-8" async></script>
     <script src="https://static.tildacdn.com/js/tilda-events-1.0.min.js" charset="utf-8" async></script>
 
-    <!-- Единый блок стилей (все стили блоков собраны здесь) -->
+    <!-- Единый блок стилей -->
     <style>
       /* ---------- Общие стили для T396 ---------- */
       .t396__artboard {
@@ -164,7 +164,6 @@
       @media screen and (max-width: 1199px) {
         #rec540056894 .tn-elem[data-elem-id="1627994674318"] {
           top: 100px;
-          /* left и width больше не задаём, центрирование уже есть */
         }
       }
       @media screen and (max-width: 959px) {
@@ -420,10 +419,11 @@
           font-size: 16px;
         }
       }
+
       /* ---------- Позиционирование блока контактов в форме ---------- */
       .contacts-block {
         position: absolute;
-        top: 180px; /* было 140px – увеличили */
+        top: 180px;
         left: 50%;
         transform: translateX(-50%);
         width: 100%;
@@ -434,19 +434,19 @@
 
       @media screen and (max-width: 960px) {
         .contacts-block {
-          top: 200px; /* было 150px */
+          top: 200px;
         }
       }
 
       @media screen and (max-width: 640px) {
         .contacts-block {
-          top: 220px; /* было 170px */
+          top: 220px;
         }
       }
 
       @media screen and (max-width: 480px) {
         .contacts-block {
-          top: 190px; /* было 150px */
+          top: 190px;
         }
       }
 
@@ -625,6 +625,13 @@
         border-color: transparent;
         border-style: solid;
       }
+      #rec342328749 .tn-elem[data-elem-id="1625236003260"] {
+        z-index: 10;
+        top: 17px;
+        left: calc(50% - 600px + 792px);
+        width: 65px;
+        height: 65px;
+      }
       @media screen and (max-width: 1199px) {
         #rec342328749 .tn-elem[data-elem-id="1625236003250"] {
           top: 17px;
@@ -649,6 +656,10 @@
         #rec342328749 .tn-elem[data-elem-id="1625236693278"] {
           top: 17px;
           left: calc(50% - 480px + 462px);
+        }
+        #rec342328749 .tn-elem[data-elem-id="1625236003260"] {
+          top: 17px;
+          left: calc(50% - 480px + 672px);
         }
       }
       @media screen and (max-width: 959px) {
@@ -675,6 +686,10 @@
         #rec342328749 .tn-elem[data-elem-id="1625236693278"] {
           top: 17px;
           left: calc(50% - 320px + 302px);
+        }
+        #rec342328749 .tn-elem[data-elem-id="1625236003260"] {
+          top: 17px;
+          left: calc(50% - 320px + 512px);
         }
       }
       @media screen and (max-width: 639px) {
@@ -719,6 +734,12 @@
           width: 40px;
           height: 40px;
         }
+        #rec342328749 .tn-elem[data-elem-id="1625236003260"] {
+          top: 10px;
+          left: calc(50% - 240px + 357px);
+          width: 40px;
+          height: 40px;
+        }
       }
       @media screen and (max-width: 479px) {
         #rec342328749 .tn-elem[data-elem-id="1625236003250"] {
@@ -745,6 +766,12 @@
           top: 10px;
           left: calc(50% - 160px + 142px);
         }
+        #rec342328749 .tn-elem[data-elem-id="1625236003260"] {
+          top: 10px;
+          left: calc(50% - 160px + 277px);
+          width: 40px;
+          height: 40px;
+        }
       }
 
       /* ---------- Организатор (rec544809815) ---------- */
@@ -763,7 +790,7 @@
         opacity: 1;
       }
 
-      /* ---------- Финальный текст (rec540334452) — исправленное центрирование ---------- */
+      /* ---------- Финальный текст (rec540334452) ---------- */
       #rec540334452 .t396__artboard {
         height: 318px;
       }
@@ -771,18 +798,15 @@
       #rec540334452 .t396__carrier {
         height: 318px;
       }
-
-      /* Универсальное центрирование для элемента текста */
       #rec540334452 .tn-elem[data-elem-id="1470209944682"] {
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: 90% !important;
         max-width: 878px !important;
         text-align: center;
-        top: 124px; /* оставляем как в исходнике, но можно скорректировать под мобилки */
+        top: 124px;
         height: auto;
       }
-      /* Корректируем вертикальное положение на мобильных экранах */
       @media screen and (max-width: 640px) {
         #rec540334452 .tn-elem[data-elem-id="1470209944682"] {
           top: 63px;
@@ -1243,7 +1267,8 @@
         bottom: 0;
         z-index: 100005;
       }
-      /* Центрирование заголовка формы */
+
+      /* ---------- Центрирование заголовка формы ---------- */
       #rec541740449 .tn-elem[data-elem-id="1625290102540"] {
         left: 50% !important;
         transform: translateX(-50%) !important;
@@ -1252,7 +1277,6 @@
         text-align: center !important;
       }
 
-      /* Отключаем старые left для всех разрешений */
       @media screen and (max-width: 1199px) {
         #rec541740449 .tn-elem[data-elem-id="1625290102540"] {
           left: 50% !important;
@@ -1277,6 +1301,7 @@
           transform: translateX(-50%) !important;
         }
       }
+
       #rec541740449 .tn-elem[data-elem-id="1674640410832"] {
         top: 580px !important;
         left: 50% !important;
@@ -1301,19 +1326,19 @@
           top: 520px !important;
         }
       }
+
       /* ---------- Настройка видео внутри формы ---------- */
       #rec541740449 #recVideoBlock {
         position: relative;
-        margin-top: 420px; /* увеличенный отступ для десктопа */
+        margin-top: 420px;
         max-width: 500px;
         margin-left: auto;
         margin-right: auto;
         clear: both;
         padding: 0 15px;
-        text-align: center; /* дополнительное центрирование для вложенных элементов */
+        text-align: center;
       }
 
-      /* Адаптация для планшетов */
       @media screen and (max-width: 960px) {
         #rec541740449 #recVideoBlock {
           margin-top: 450px;
@@ -1321,10 +1346,9 @@
         }
       }
 
-      /* Адаптация для телефонов */
       @media screen and (max-width: 640px) {
         #rec541740449 #recVideoBlock {
-          margin-top: 380px; /* увеличили, чтобы уйти от контактов */
+          margin-top: 380px;
           max-width: 90%;
         }
       }
@@ -1335,13 +1359,13 @@
           max-width: 95%;
         }
       }
+
       #rec541740449 #recVideoBlock .t255 {
         width: 100%;
-        max-width: 500px; /* или 450px для планшетов */
+        max-width: 500px;
         margin: 0 auto;
       }
 
-      /* И для видео внутри */
       #rec541740449 #recVideoBlock video {
         width: 100%;
         height: auto;
@@ -1349,47 +1373,7 @@
         margin: 0 auto;
       }
 
-      /* ---------- Новый кружок для Dress Code (#86b9f2) ---------- */
-      #rec342328749 .tn-elem[data-elem-id="1625236003260"] {
-        z-index: 10;
-        top: 17px;
-        left: calc(50% - 600px + 792px);
-        width: 65px;
-        height: 65px;
-      }
-
-      @media screen and (max-width: 1199px) {
-        #rec342328749 .tn-elem[data-elem-id="1625236003260"] {
-          top: 17px;
-          left: calc(50% - 480px + 672px);
-        }
-      }
-
-      @media screen and (max-width: 959px) {
-        #rec342328749 .tn-elem[data-elem-id="1625236003260"] {
-          top: 17px;
-          left: calc(50% - 320px + 512px);
-        }
-      }
-
-      @media screen and (max-width: 639px) {
-        #rec342328749 .tn-elem[data-elem-id="1625236003260"] {
-          top: 10px;
-          left: calc(50% - 240px + 357px);
-          width: 40px;
-          height: 40px;
-        }
-      }
-
-      @media screen and (max-width: 479px) {
-        #rec342328749 .tn-elem[data-elem-id="1625236003260"] {
-          top: 10px;
-          left: calc(50% - 160px + 277px);
-          width: 40px;
-          height: 40px;
-        }
-      }
-      /* Увеличиваем высоту блока с формой, чтобы отодвинуть следующий разделитель */
+      /* ---------- Увеличиваем высоту блока с формой ---------- */
       #rec541740449 .t396__artboard {
         height: 1120px !important;
       }
@@ -1409,7 +1393,6 @@
         }
       }
 
-      /* Дополнительный нижний отступ самого блока для надёжности */
       #rec541740449 {
         padding-bottom: 40px;
       }
@@ -1419,17 +1402,6 @@
         }
       }
     </style>
-
-    <!-- Скрипт для скрытия заставки -->
-    <script>
-      $(window).on("load", function () {
-        setTimeout(function () {
-          $("#rec540056894").fadeOut("slow");
-          $("body").css("overflow", "");
-          window.dispatchEvent(new Event("resize"));
-        }, 60000);
-      });
-    </script>
   </head>
 
   <body class="t-body" style="margin: 0">
@@ -1636,8 +1608,7 @@
                 />
               </div>
             </div>
-            <div
-              class="t396__elem tn-elem tn-elem__3423446881627994674318"
+            <div              class="t396__elem tn-elem tn-elem__3423446881627994674318"
               data-elem-id="1627994674318"
               data-elem-type="text"
               data-field-top-value="113"
@@ -2310,6 +2281,7 @@
           });
         </script>
       </div>
+
       <!-- ========== РАЗДЕЛИТЕЛЬ ========== -->
       <div
         id="rec342328752"
@@ -2331,7 +2303,7 @@
         </div>
       </div>
 
-      <!-- ========== ВИДЕОБЛОК (отдельный, между разделителем и формой) ========== -->
+      <!-- ========== ВИДЕОБЛОК ========== -->
       <div
         id="recVideoBlock"
         class="r t-rec t-rec_pt_0 t-rec_pb_0"
@@ -2383,7 +2355,7 @@
             <div class="t396__carrier" data-artboard-recid="541740449"></div>
             <div class="t396__filter" data-artboard-recid="541740449"></div>
 
-            <!-- Блок контактов (абсолютное позиционирование, но теперь не конфликтует с видео) -->
+            <!-- Блок контактов -->
             <div class="contacts-block" data-elem-type="text">
               <div style="font-family: ZAG, Arial, sans-serif; font-weight: 100; font-size: 28px; margin-bottom: 15px">
                 ПОДТВЕРДИТЕ, ПОЖАЛУЙСТА, СВОЁ ПРИСУТСТВИЕ НА ТОРЖЕСТВЕ<br />Свяжитесь с нами
@@ -2458,7 +2430,7 @@
               </div>
             </div>
 
-            <!-- Поле формы (анкета) – расположено ниже контактов -->
+            <!-- Поле формы (анкета) -->
             <div
               class="t396__elem tn-elem tn-elem__5417404491674640410832"
               data-elem-id="1674640410832"
@@ -2555,6 +2527,7 @@
           </div>
         </div>
       </div>
+
       <!-- ========== ОРГАНИЗАТОР ========== -->
       <div
         id="rec544809815"
@@ -2623,7 +2596,6 @@
               </div>
               <div class="t-sociallinks">
                 <ul role="list" class="t-sociallinks__wrapper" aria-label="Social media links">
-                  <!-- Instagram -->
                   <li class="t-sociallinks__item t-sociallinks__item_instagram">
                     <a
                       href="https://www.instagram.com/alena_syrchinaa"
@@ -2650,7 +2622,6 @@
                       </svg>
                     </a>
                   </li>
-                  <!-- Telegram -->
                   <li class="t-sociallinks__item t-sociallinks__item_telegram">
                     <a
                       href="https://t.me/alena_syrchinaa"
@@ -2835,6 +2806,8 @@
         </script>
       </div>
     </div>
+
+    <!-- ========== ОСНОВНОЙ СКРИПТ ========== -->
     <script>
       (function () {
         var inviteCode = getInviteCode();
@@ -2844,10 +2817,14 @@
           setTimeout(renderResponseForm, 700);
           setTimeout(renderResponseForm, 2000);
           watchResponseForm();
+
           if (!inviteCode) {
-            showFallback();
+            // Если нет кода приглашения - показываем "Сейчас будет что-то интересное..."
+            showOnly("rec600785773");
             return;
           }
+
+          // Если код есть - показываем заставку, а затем основной контент
           showOnly("rec540056894");
           loadInvitation(inviteCode);
         });
@@ -2876,15 +2853,13 @@
           });
         }
 
-        function showFallback() {
-          showOnly("rec600785773");
-        }
-
         function showInvitation() {
           allRecords().forEach(function (record) {
+            // Скрываем заставку и фолбэк-блок, показываем всё остальное
             var isGreeting = record.id === "rec540056894";
-            record.classList.toggle("hidden", isGreeting);
-            if (!isGreeting) {
+            var isFallback = record.id === "rec600785773";
+            record.classList.toggle("hidden", isGreeting || isFallback);
+            if (!isGreeting && !isFallback) {
               record.style.display = "";
               record.style.opacity = "";
             }
@@ -2911,14 +2886,19 @@
             }
             var data = await response.json();
             setGreeting(data.invitation && data.invitation.invitation_text);
-            showOnly("rec540056894");
+
+            // Показываем заставку 3 секунды, затем переходим к основному контенту
             setTimeout(function () {
               showInvitation();
               window.scrollTo({ top: 0, behavior: "auto" });
-            }, 10000 );
+            }, 10000);
           } catch (error) {
             showFallback();
           }
+        }
+
+        function showFallback() {
+          showOnly("rec600785773");
         }
 
         function renderResponseForm() {
